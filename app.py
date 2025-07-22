@@ -35,30 +35,25 @@ if page == "📖 每日一雀":
         st.markdown("[🎧 聽叫聲]({})".format(bird['audio_url']))
 
 # --- 所有鳥類 ---
-elif page == "🗂️ 所有鳥類總覽":
-    families = sorted(df['family'].dropna().unique())
-    selected_family = st.sidebar.selectbox("篩選科別：", ["全部"] + families)
+elif page == "📋 所有鳥類":
+    st.title("📋 所有鳥類清單")
 
-    if selected_family != "全部":
-        filtered_df = df[df['family'] == selected_family]
-    else:
-        filtered_df = df
+    # 按 family 分組
+    grouped = df.groupby("family")
 
-    for _, bird in filtered_df.iterrows():
-        st.subheader(bird['chinese_name'] + f" ({bird['english_name']})")
-        col1, col2 = st.columns([1, 2])
-        with col1:
-            if pd.notna(bird['image_url']):
-                st.image(bird['image_url'], width=200)
-        with col2:
-            st.markdown(f"**德文名**：{bird['german_name']}")
-            st.markdown(f"**學名**：{bird['scientific_name']}")
-            st.markdown(f"**科別**：{bird['family']}")
-            st.markdown(f"**介紹**：{bird['introduction'][:150]}...")
-            st.markdown(f"**趣聞**：{bird['fun_facts'][:100]}...")
-            if pd.notna(bird['audio_url']):
-                st.markdown("[🎧 聽叫聲]({})".format(bird['audio_url']))
-        st.markdown("---")
+    for family_name, group in grouped:
+        with st.expander(f"🧬 科：{family_name}（共 {len(group)} 種）"):
+            for _, bird in group.iterrows():
+                with st.expander(f"{bird['chinese_name']} ({bird['english_name']} / {bird['german_name']})"):
+                    st.subheader(f"學名：{bird['scientific_name']}｜科：{bird['family']}")
+                    st.image(bird["image_url"], use_container_width=True)
+                    if pd.notna(bird["audio_url"]):
+                        st.audio(bird["audio_url"])
+                    st.markdown("### 📘 介紹")
+                    st.write(bird["introduction"])
+                    st.markdown("### 🎉 趣聞 Fun Facts")
+                    st.write(bird['fun_facts'])
+
 
 # --- 小遊戲 ---
 elif page == "🎮 小遊戲：猜猜鳥":
