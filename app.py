@@ -16,6 +16,10 @@ def show_bird_info(bird):
     st.image(bird['image_url'], width=300)
     if pd.notna(bird['audio_url']):
         st.audio(bird['audio_url'])
+        if pd.notna(bird['audio_url']) and bird['audio_url'] != '':
+            st.audio(bird['audio_url'])
+        else:
+            st.info("🚫 無音頻連結")
     st.markdown(f"**簡介**:{bird['introduction']}")
     st.markdown(f"**有趣知識**:{bird['fun_facts']}")
 
