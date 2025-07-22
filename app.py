@@ -50,69 +50,61 @@ elif page == "📋 所有鳥類":
 
 # 🎮 小遊戲
 elif page == "🎮 小遊戲":
-
-    def init_quiz():
-        st.session_state.quiz_index = random.randint(0, len(birds) - 1)
-        st.session_state.answered = False
-        st.session_state.correct = False
-        st.session_state.question_type = random.choice(
-            ["scientific_name", "chinese_name", "english_name", "german_name", "introduction"]
-        )
+    st.title("🎮 小遊戲：測下你識幾多雀！")
 
     if "quiz_index" not in st.session_state:
-        init_quiz()
+        st.session_state.quiz_index = random.randint(0, len(birds) - 1)
+        st.session_state.answered = False
+        st.session_state.correct = None
+        st.session_state.selected_option = None
+        st.session_state.question_type = random.choice(["english_name", "german_name", "scientific_name", "chinese_name", "introduction"])
 
     bird = birds[st.session_state.quiz_index]
     question_type = st.session_state.question_type
 
-    st.title("🎮 小遊戲：測下你識幾多雀！")
-
+    # 問題文字
     question_map = {
-        "scientific_name": "學名",
-        "chinese_name": "中文名",
-        "english_name": "英文名",
-        "german_name": "德文名",
-        "introduction": "介紹"
+        "english_name": "呢隻鳥嘅英文名係邊個？",
+        "german_name": "呢隻鳥嘅德文名係邊個？",
+        "scientific_name": "呢隻鳥嘅學名係邊個？",
+        "chinese_name": "呢隻鳥嘅中文名係邊個？",
+        "introduction": "以下邊段係呢隻鳥嘅簡介？"
     }
+    correct_answer = bird[question_type]
 
-    if question_type == "introduction":
-        st.markdown("### ❓ 根據以下介紹，呢隻係咩鳥？")
-        st.info(bird["introduction"])
-        correct_answer = bird["chinese_name"]
-        options = [correct_answer]
-        while len(options) < 4:
-            other = random.choice(birds)["chinese_name"]
-            if other not in options and pd.notna(other):
-                options.append(other)
-    else:
-        st.image(bird["image_url"], width=300)
-        st.markdown(f"### ❓ 呢隻鳥嘅 {question_map[question_type]} 係邊個？")
-        correct_answer = bird[question_type]
-        options = [correct_answer]
-        while len(options) < 4:
-            other = random.choice(birds)[question_type]
-            if other not in options and pd.notna(other):
-                options.append(other)
+    st.image(bird["image_url"], use_container_width=True)
+    st.markdown(f"### ❓ {question_map[question_type]}")
 
+    # 隨機選項（含正確答案）
+    options = [correct_answer]
+    while len(options) < 4:
+        option = random.choice(birds)[question_type]
+        if option not in options and pd.notna(option):
+            options.append(option)
     random.shuffle(options)
 
-    # 只更新 radio，唔即時處理答案
-    if "user_answer" not in st.session_state:
-        st.session_state.user_answer = None
-
-    selected = st.radio("請選擇：", options, key="quiz_radio")
-
-    # 改左 radio，要手動更新 user_answer
-    if st.session_state.user_answer != selected:
-        st.session_state.user_answer = selected
-
+    # 顯示選項
+    selected = st.radio("請選擇：", options, index=options.index(st.session_state.selected_option) if st.session_state.selected_option in options else 0)
 
     if not st.session_state.answered:
         if st.button("✅ 提交答案"):
-            if st.session_state.user_answer == correct_answer:
+            st.session_state.selected_option = selected
+            if selected == correct_answer:
                 st.success("🎉 答啱喇！")
                 st.session_state.correct = True
             else:
                 st.error(f"😢 錯喇，正確答案係：{correct_answer}")
+                st.session_state.correct = False
             st.session_state.answered = True
+    else:
+        if st.session_state.correct is True:
+            st.success("🎉 你啱晒啦！")
+        else:
+            st.error(f"😢 錯喇，正確答案係：{correct_answer}")
 
+        if st.button("➡️ 下一題"):
+            st.session_state.quiz_index = random.randint(0, len(birds) - 1)
+            st.session_state.answered = False
+            st.session_state.correct = None
+            st.session_state.selected_option = None
+            st.session_state.question_type = random.choice(["english_name", "german_name", "scientific_name", "chinese_name", "introduction"])
