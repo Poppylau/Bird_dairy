@@ -5,7 +5,7 @@ import random
 st.set_page_config(page_title="每日一鳥", page_icon="🐦", layout="centered")
 
 # 讀 Excel
-df = pd.read_excel("bird_data.xlsx")
+df = pd.read_excel("Bird_data.xlsx")
 birds = df.to_dict(orient="records")
 
 def get_today_bird():
