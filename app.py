@@ -19,7 +19,7 @@ if page == "📖 每日一雀":
     st.subheader(bird['german_name'])
 
     if pd.notna(bird['image_url']):
-        st.image(bird['image_url'], use_column_width=True)
+        st.image(bird['image_url'], use_container_width=True)
 
     st.markdown(f"**學名**：{bird['scientific_name']}")
     st.markdown(f"**科別**：{bird['family']}")
