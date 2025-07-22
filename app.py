@@ -16,10 +16,8 @@ def show_bird_info(bird):
     st.image(bird['image_url'], width=300)
     if pd.notna(bird['audio_url']):
         st.audio(bird['audio_url'])
-    st.markdown(f"**簡介**:
-{bird['introduction']}")
-    st.markdown(f"**有趣知識**:
-{bird['fun_facts']}")
+    st.markdown(f"**簡介**:{bird['introduction']}")
+    st.markdown(f"**有趣知識**:{bird['fun_facts']}")
 
 if page == "📖 每日一雀":
     st.title("📖 每日一雀")
