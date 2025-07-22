@@ -15,10 +15,10 @@ def show_bird_info(bird):
     st.header(f"{bird['chinese_name']} ({bird['english_name']} / {bird['german_name']})")
     st.subheader(f"📖 學名：{bird['scientific_name']}｜科：{bird['family']}")
     
-    if pd.notna(bird["image_url"]) and bird["image_url"] != "":
+    if pd.notna(bird["image_url"]) and str(bird["image_url"]).strip().startswith("http"):
         st.image(bird["image_url"], use_container_width=True)
-    
-    if pd.notna(bird["audio_url"]) and bird["audio_url"] != "":
+
+    if pd.notna(bird["audio_url"]) and str(bird["audio_url"]).strip().startswith("http"):
         st.audio(bird["audio_url"])
     
     st.markdown("### 📘 介紹")
@@ -27,6 +27,7 @@ def show_bird_info(bird):
     if pd.notna(bird["fun_facts"]) and bird["fun_facts"] != "":
         st.markdown("### 🎯 趣味小知識")
         st.write(bird["fun_facts"])
+
 
 # 主選單
 page = st.sidebar.radio("📖 請選擇頁面：", ["🐦 每日一雀", "📋 所有鳥類", "🎮 小遊戲"])
