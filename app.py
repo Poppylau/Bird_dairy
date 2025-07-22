@@ -49,21 +49,66 @@ elif page == "📋 所有鳥類":
                     show_bird_info(bird)
 
 # 🎮 小遊戲
-elif page == "🎮 小遊戲":
-    st.title("🎮 雀鳥小測驗")
-    bird = get_today_bird()
+elif page == "🧠 小測驗":
+    st.title("🧠 小測驗：你識幾多雀？")
 
-    st.markdown("#### 以下是介紹，請猜猜是哪一隻雀：")
-    st.write(bird["introduction"])
+    if "quiz_index" not in st.session_state:
+        st.session_state.quiz_index = random.randint(0, len(birds) - 1)
+        st.session_state.answered = False
+        st.session_state.correct = False
+        st.session_state.question_type = random.choice(
+            ["scientific_name", "chinese_name", "english_name", "german_name", "introduction"]
+        )
 
-    choice = st.radio("你覺得係邊隻雀？", [b["chinese_name"] for b in birds])
-    
-    if st.button("提交答案"):
-        if choice == bird["chinese_name"]:
-            st.success("🎉 答對了！")
-            st.write(f"英文名：**{bird['english_name']}**")
-            st.write(f"德文名：**{bird['german_name']}**")
-            st.write(f"學名：**{bird['scientific_name']}**")
-        else:
-            st.error("❌ 錯咗，再試下！")
-            st.info(f"正確答案係：{bird['chinese_name']}")
+    bird = birds[st.session_state.quiz_index]
+    question_type = st.session_state.question_type
+
+    question_map = {
+        "scientific_name": "學名",
+        "chinese_name": "中文名",
+        "english_name": "英文名",
+        "german_name": "德文名",
+        "introduction": "介紹"
+    }
+
+    # 顯示提示
+    if question_type == "introduction":
+        st.markdown("### ❓ 根據以下介紹，呢隻係咩鳥？")
+        st.info(bird["introduction"])
+        correct_answer = bird["chinese_name"]
+        options = [correct_answer]
+        while len(options) < 4:
+            other = random.choice(birds)["chinese_name"]
+            if other not in options and pd.notna(other):
+                options.append(other)
+    else:
+        st.image(bird["image_url"], width=300)
+        st.markdown(f"### ❓ 呢隻鳥嘅 {question_map[question_type]} 係邊個？")
+        correct_answer = bird[question_type]
+        options = [correct_answer]
+        while len(options) < 4:
+            other = random.choice(birds)[question_type]
+            if other not in options and pd.notna(other):
+                options.append(other)
+
+    random.shuffle(options)
+
+    selected = st.radio("請選擇：", options, key="quiz_radio")
+
+    if not st.session_state.answered:
+        if st.button("✅ 提交答案"):
+            if selected == correct_answer:
+                st.success("🎉 答啱喇！")
+                st.session_state.correct = True
+            else:
+                st.error(f"😢 錯喇，正確答案係：{correct_answer}")
+            st.session_state.answered = True
+    else:
+        if st.button("➡️ 下一題"):
+            st.session_state.quiz_index = random.randint(0, len(birds) - 1)
+            st.session_state.answered = False
+            st.session_state.correct = False
+            st.session_state.question_type = random.choice(
+                ["scientific_name", "chinese_name", "english_name", "german_name", "introduction"]
+            )
+            st.experimental_rerun()
