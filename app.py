@@ -49,10 +49,9 @@ elif page == "📋 所有鳥類":
                     show_bird_info(bird)
 
 # 🎮 小遊戲
-elif page == "🧠 小測驗":
-    st.title("🧠 小測驗：你識幾多雀？")
+elif page == "🎮 小遊戲":
 
-    if "quiz_index" not in st.session_state:
+    def init_quiz():
         st.session_state.quiz_index = random.randint(0, len(birds) - 1)
         st.session_state.answered = False
         st.session_state.correct = False
@@ -60,8 +59,13 @@ elif page == "🧠 小測驗":
             ["scientific_name", "chinese_name", "english_name", "german_name", "introduction"]
         )
 
+    if "quiz_index" not in st.session_state:
+        init_quiz()
+
     bird = birds[st.session_state.quiz_index]
     question_type = st.session_state.question_type
+
+    st.title("🎮 小遊戲：測下你識幾多雀！")
 
     question_map = {
         "scientific_name": "學名",
@@ -71,7 +75,6 @@ elif page == "🧠 小測驗":
         "introduction": "介紹"
     }
 
-    # 顯示提示
     if question_type == "introduction":
         st.markdown("### ❓ 根據以下介紹，呢隻係咩鳥？")
         st.info(bird["introduction"])
@@ -105,10 +108,5 @@ elif page == "🧠 小測驗":
             st.session_state.answered = True
     else:
         if st.button("➡️ 下一題"):
-            st.session_state.quiz_index = random.randint(0, len(birds) - 1)
-            st.session_state.answered = False
-            st.session_state.correct = False
-            st.session_state.question_type = random.choice(
-                ["scientific_name", "chinese_name", "english_name", "german_name", "introduction"]
-            )
+            init_quiz()
             st.experimental_rerun()
