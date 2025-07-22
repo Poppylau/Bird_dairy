@@ -96,17 +96,23 @@ elif page == "🎮 小遊戲":
 
     random.shuffle(options)
 
+    # 只更新 radio，唔即時處理答案
+    if "user_answer" not in st.session_state:
+        st.session_state.user_answer = None
+
     selected = st.radio("請選擇：", options, key="quiz_radio")
+
+    # 改左 radio，要手動更新 user_answer
+    if st.session_state.user_answer != selected:
+        st.session_state.user_answer = selected
+
 
     if not st.session_state.answered:
         if st.button("✅ 提交答案"):
-            if selected == correct_answer:
+            if st.session_state.user_answer == correct_answer:
                 st.success("🎉 答啱喇！")
                 st.session_state.correct = True
             else:
                 st.error(f"😢 錯喇，正確答案係：{correct_answer}")
             st.session_state.answered = True
-    else:
-        if st.button("➡️ 下一題"):
-            init_quiz()
-            st.experimental_rerun()
+
